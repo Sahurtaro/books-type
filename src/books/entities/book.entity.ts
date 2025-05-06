@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+} from 'typeorm';
+import { Author } from '../../authors/entities/author.entity';
 
 @Entity('books')
 export class Book {
@@ -31,4 +38,8 @@ export class Book {
   deleted_at: Date;
   @Column({ type: 'boolean', default: true })
   active: boolean;
+  @ManyToOne(() => Author, (author) => author.id, {
+    eager: true, //para traer el autor cuando se haga un findOne del book
+  })
+  author: Author;
 }

@@ -1,34 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Author } from '../authors/entities/author.entity';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book)
     private readonly bookRepository: Repository<Book>,
+    @InjectRepository(Author)
+    private readonly authorRepository: Repository<Author>,
   ) {}
 
   async create(createBookDto: CreateBookDto) {
-    return await this.bookRepository.save(createBookDto);
+    const author = await this.authorRepository.findOneBy({
+      name: createBookDto.author,
+    });
+    if (!author) {
+      throw new BadRequestException('Author not found');
+    }
+    return await this.bookRepository.save({ ...createBookDto, author });
   }
 
   async findAll() {
     return await this.bookRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async findOne(id: number) {
+    return await this.bookRepository.findOneBy({ id });
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  async update(id: number, updateBookDto: UpdateBookDto) {
+    return await this.bookRepository.update(id, updateBookDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async remove(id: number) {
+    return await this.bookRepository.softDelete(id);
   }
 }
