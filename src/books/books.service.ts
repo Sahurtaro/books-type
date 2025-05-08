@@ -34,7 +34,14 @@ export class BooksService {
   }
 
   async update(id: number, updateBookDto: UpdateBookDto) {
-    return await this.bookRepository.update(id, updateBookDto);
+    const author = await this.authorRepository.findOneBy({
+      name: updateBookDto.author,
+    });
+
+    if (!author) {
+      throw new BadRequestException('Author not found');
+    }
+    return await this.bookRepository.update(id, { ...updateBookDto, author });
   }
 
   async remove(id: number) {
