@@ -1,11 +1,21 @@
 /* eslint-disable prettier/prettier */
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from './../users/users.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import * as bcryptjs from 'bcryptjs';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly UsersService: UsersService) {}
+  constructor(
+    private readonly UsersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register({ name, email, password }: RegisterDto) {
     const user = await this.UsersService.findOneByEmail(email);
@@ -14,10 +24,28 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    return await this.UsersService.create({ name, email, password });
+    return await this.UsersService.create({
+      name,
+      email,
+      password: await bcryptjs.hash(password, 10),
+    });
   }
 
-  login() {
-    return 'login';
+  async login(loginDto: LoginDto) {
+    const user = await this.UsersService.findOneByEmail(loginDto.email);
+
+    if (!user) {
+      throw new UnauthorizedException('Email is wrong');
+    }
+    const isPasswordValid = await bcryptjs.compare(
+      loginDto.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Password is wrong');
+    }
+    const payload = { email: user.email };
+    const token = await this.jwtService.signAsync(payload);
+    return { token, email: loginDto.email };
   }
 }
