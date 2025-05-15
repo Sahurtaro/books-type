@@ -12,8 +12,8 @@ export class User {
   email: string;
   @Column({ nullable: false, select: true })
   password: string;
-  //   @Column({ type: 'enum', default: Role.USER, enum: Role })
-  //   role: Role;
+  @Column({ default: 'user' })
+  role: string;
   @DeleteDateColumn()
   deleted_at: Date;
 }
