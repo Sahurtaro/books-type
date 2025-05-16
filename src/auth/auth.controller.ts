@@ -1,12 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from './guard/auth.guard';
 import { Request } from 'express';
-import { Roles } from './decorators/roles.decorators';
-import { RolesGuard } from './guard/roles.guard';
+import { Role } from './enums/role.enum';
+import { Auth } from './decorators/auth.decorator';
 
 interface RequestWithUser extends Request {
   user: {
@@ -28,9 +27,14 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  // @Get('profile')
+  // @Roles(Role.USER)
+  // @UseGuards(AuthGuard, RolesGuard)
+  // profile(@Req() req): RequestWithUser {
+  //   return req.user;
+  // }
   @Get('profile')
-  @Roles('admin')
-  @UseGuards(AuthGuard, RolesGuard)
+  @Auth(Role.USER)
   profile(@Req() req): RequestWithUser {
     return req.user;
   }
