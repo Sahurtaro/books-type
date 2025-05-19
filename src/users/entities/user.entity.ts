@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Column, DeleteDateColumn, Entity } from 'typeorm';
+import { Role } from '../../common/enums/role.enum';
 // import { Role } from '../../common/enum/role.enum';
 
 @Entity()
@@ -12,7 +13,7 @@ export class User {
   email: string;
   @Column({ nullable: false, select: false })
   password: string;
-  @Column({ default: 'user' })
+  @Column({ type: 'enum', default: Role.USER, enum: Role })
   role: string;
   @DeleteDateColumn()
   deleted_at: Date;
