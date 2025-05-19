@@ -29,6 +29,13 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
+  findOneByEmailWithPassword(email: string) {
+    return this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email', 'password', 'role'],
+    });
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
