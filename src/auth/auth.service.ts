@@ -13,18 +13,18 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly UsersService: UsersService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
   async register({ name, email, password }: RegisterDto) {
-    const user = await this.UsersService.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
       throw new BadRequestException('User already exists');
     }
 
-    return await this.UsersService.create({
+    return await this.usersService.create({
       name,
       email,
       password: await bcryptjs.hash(password, 10),
@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.UsersService.findOneByEmailWithPassword(
+    const user = await this.usersService.findOneByEmailWithPassword(
       loginDto.email,
     );
 
@@ -49,5 +49,12 @@ export class AuthService {
     const payload = { email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload);
     return { token, email: loginDto.email };
+  }
+
+  async profile({ email, role }: { email: string; role: string }) {
+    if (role !== 'admin') {
+      throw new UnauthorizedException('You are not authorized');
+    }
+    return await this.usersService.findOneByEmail(email);
   }
 }
