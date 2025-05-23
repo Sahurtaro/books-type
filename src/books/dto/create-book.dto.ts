@@ -3,7 +3,6 @@ import { IsInt, IsNotEmpty, IsString, Min, MinLength } from 'class-validator';
 
 export class CreateBookDto {
   @IsString({ message: 'El campo de nombre debe ser un string' })
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsNotEmpty()
   //   @ApiProperty({
   //     title: 'The title of the book',

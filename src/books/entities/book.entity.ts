@@ -9,9 +9,6 @@ import { Author } from '../../authors/entities/author.entity';
 
 @Entity('books')
 export class Book {
-  save() {
-    throw new Error('Method not implemented.');
-  }
   @Column({ primary: true, generated: true })
   id: number;
   @Column()
