@@ -1,3 +1,4 @@
+import { UserActiveInterface } from './../common/interfaces/user-active.interface';
 /* eslint-disable prettier/prettier */
 import {
   Controller,
@@ -11,6 +12,9 @@ import {
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { ActiveUser } from '../common/decorators/active-user.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { Role } from '../common/enums/role.enum';
 // import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 // import { ActiveUser } from '../common/decorators/active-user.decorator';
 
@@ -19,8 +23,12 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  @Auth(Role.USER)
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @ActiveUser() user: UserActiveInterface,
+  ) {
+    return this.commentsService.create(createCommentDto, user);
   }
 
   @Get()

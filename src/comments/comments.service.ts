@@ -7,6 +7,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
+import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 
 @Injectable()
 export class CommentsService {
@@ -14,9 +15,12 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
   ) {}
-  async create(createCommentDto: CreateCommentDto) {
-    const comment = this.commentRepository.create(createCommentDto);
-    return await this.commentRepository.save(comment);
+  async create(createCommentDto: CreateCommentDto, user: UserActiveInterface) {
+    // const comment = this.commentRepository.create(createCommentDto);
+    return await this.commentRepository.save({
+      ...createCommentDto,
+      userEmail: user.email,
+    });
   }
 
   findAll() {
