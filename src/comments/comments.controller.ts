@@ -18,17 +18,18 @@ import { Role } from '../common/enums/role.enum';
 // import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 // import { ActiveUser } from '../common/decorators/active-user.decorator';
 
-@Controller('comments')
+@Controller('comments/:bookId')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
   @Auth(Role.USER)
   create(
+    @Param('bookId') bookId: string,
     @Body() createCommentDto: CreateCommentDto,
     @ActiveUser() user: UserActiveInterface,
   ) {
-    return this.commentsService.create(createCommentDto, user);
+    return this.commentsService.create(createCommentDto, user, bookId);
   }
 
   @Get()

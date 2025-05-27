@@ -15,11 +15,15 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
   ) {}
-  async create(createCommentDto: CreateCommentDto, user: UserActiveInterface) {
-    // const comment = this.commentRepository.create(createCommentDto);
+  async create(
+    createCommentDto: CreateCommentDto,
+    user: UserActiveInterface,
+    bookId: string,
+  ) {
     return await this.commentRepository.save({
       ...createCommentDto,
       userEmail: user.email,
+      bookId,
     });
   }
 

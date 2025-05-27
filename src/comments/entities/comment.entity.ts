@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Book } from '../../books/entities/book.entity';
 // import { Book } from '../../books/entities/book.entity';
 // import { User } from '../../users/entities/user.entity';
 
@@ -27,19 +28,14 @@ export class Comment {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userEmail', referencedColumnName: 'email' })
-  user: User;
+  user: User; //de esta manera no se instancia el usuario completo, solo se guarda la referencia al email
 
   @Column()
   userEmail: string;
 
-  // @ManyToOne(() => User)
-  // @JoinColumn({ name: 'userEmail', referencedColumnName: 'email' }) //con esto evitamos tener que pasarle la instancia del usuario para crear el comentario
-  // user: User;
-  // @Column()
-  // userEmail: string;
-  // @ManyToOne(() => User)
-  // @JoinColumn({ name: 'userId', referencedColumnName: 'id' }) //con esto evitamos tener que pasarle la instancia del usuario para crear el comentario
-  // user: User;
-  // @Column()
-  // userId: number;
+  @ManyToOne(() => Book)
+  @JoinColumn({ name: 'bookId', referencedColumnName: 'id' })
+  book: Book; //de esta manera no se instancia el libro completo, solo se guarda la referencia al id
+  @Column()
+  bookId: string;
 }
