@@ -1,5 +1,5 @@
-import { UserActiveInterface } from './../common/interfaces/user-active.interface';
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   Controller,
   Get,
@@ -15,14 +15,13 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { ActiveUser } from '../common/decorators/active-user.decorator';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from '../common/enums/role.enum';
-// import { UserActiveInterface } from '../common/interfaces/user-active.interface';
-// import { ActiveUser } from '../common/decorators/active-user.decorator';
+import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 
-@Controller('comments/:bookId')
+@Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post()
+  @Post(':bookId')
   @Auth(Role.USER)
   create(
     @Param('bookId') bookId: string,
@@ -33,8 +32,9 @@ export class CommentsController {
   }
 
   @Get()
-  findAll() {
-    return this.commentsService.findAll();
+  @Auth(Role.USER)
+  findAll(@ActiveUser() user: UserActiveInterface) {
+    return this.commentsService.findAll(user);
   }
 
   @Get(':id')
