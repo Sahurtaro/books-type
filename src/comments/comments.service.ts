@@ -1,7 +1,12 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Repository } from 'typeorm';
@@ -24,13 +29,7 @@ export class CommentsService {
     user: UserActiveInterface,
     bookId: string,
   ) {
-    const book = await this.booksRepository.findOne({
-      where: { id: Number(bookId) },
-    });
-
-    if (!book) {
-      throw new NotFoundException(`Book with ID ${bookId} not found`);
-    }
+    await this.validateBookExists(bookId);
 
     return await this.commentRepository.save({
       ...createCommentDto,
@@ -48,8 +47,13 @@ export class CommentsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async findOne(id: number, user: UserActiveInterface) {
+    const comment = await this.commentRepository.findOneBy({ id });
+    if (!comment) {
+      throw new BadRequestException(`Comment with ID ${id} not found`);
+    }
+    this.validateOwnership(comment, user);
+    return comment;
   }
 
   update(id: number, updateCommentDto: UpdateCommentDto) {
@@ -58,5 +62,20 @@ export class CommentsService {
 
   remove(id: number) {
     return `This action removes a #${id} comment`;
+  }
+
+  private validateOwnership(comment: Comment, user: UserActiveInterface) {
+    if (user.role !== Role.ADMIN && comment.userEmail !== user.email) {
+      throw new UnauthorizedException('You do not own this comment');
+    }
+  }
+
+  private async validateBookExists(bookId: string) {
+    const book = await this.booksRepository.findOne({
+      where: { id: Number(bookId) },
+    });
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${bookId} not found`);
+    }
   }
 }

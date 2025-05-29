@@ -38,8 +38,9 @@ export class CommentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id);
+  @Auth(Role.USER)
+  findOne(@Param('id') id: number, @ActiveUser() user: UserActiveInterface) {
+    return this.commentsService.findOne(id, user);
   }
 
   @Patch(':id')
