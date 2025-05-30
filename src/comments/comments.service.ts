@@ -56,8 +56,18 @@ export class CommentsService {
     return comment;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  async update(
+    id: number,
+    updateCommentDto: UpdateCommentDto,
+    user: UserActiveInterface,
+  ) {
+    await this.findOne(id, user);
+    // const book = await this.validateBookExists(updateCommentDto.bookId);
+
+    return await this.commentRepository.update(id, {
+      ...updateCommentDto,
+      userEmail: user.email,
+    });
   }
 
   remove(id: number) {
