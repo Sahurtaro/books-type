@@ -54,7 +54,8 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id);
+  @Auth(Role.USER)
+  remove(@Param('id') id: number, @ActiveUser() user: UserActiveInterface) {
+    return this.commentsService.remove(id, user);
   }
 }

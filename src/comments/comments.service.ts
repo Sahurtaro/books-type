@@ -62,7 +62,6 @@ export class CommentsService {
     user: UserActiveInterface,
   ) {
     await this.findOne(id, user);
-    // const book = await this.validateBookExists(updateCommentDto.bookId);
 
     return await this.commentRepository.update(id, {
       ...updateCommentDto,
@@ -70,8 +69,10 @@ export class CommentsService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: number, user: UserActiveInterface) {
+    await this.findOne(id, user);
+
+    return await this.commentRepository.softDelete({ id });
   }
 
   private validateOwnership(comment: Comment, user: UserActiveInterface) {
